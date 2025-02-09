@@ -64,7 +64,7 @@ public class FilmController {
                 .mapToLong(id -> id)
                 .max()
                 .orElse(0);
-        log.info("Для фильма сгенерирован ID: {}", currentMaxId+1);
+        log.info("Для фильма сгенерирован ID: {}", currentMaxId + 1);
         return ++currentMaxId;
     }
 
