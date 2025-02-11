@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +16,7 @@ import java.util.*;
 @RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
-    @Autowired
     private final FilmService filmService;
-    @Autowired
     private final FilmStorage filmStorage;
 
     @GetMapping

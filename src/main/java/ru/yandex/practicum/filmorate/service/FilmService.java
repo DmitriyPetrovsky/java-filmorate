@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -18,11 +15,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FilmService {
-    @Autowired
     private final FilmStorage filmStorage;
-    @Autowired
     private final UserService userService;
-    private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
     public void likeFilm(long filmId, long userId) {
         Film film = getFilmById(filmId);

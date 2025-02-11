@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(BindException e) {
         Map<String, String> errors = new HashMap<>();
