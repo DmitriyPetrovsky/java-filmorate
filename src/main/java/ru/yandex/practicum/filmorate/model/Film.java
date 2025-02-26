@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.validator.MinimumDate;
 
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Data
@@ -20,4 +22,5 @@ public class Film {
     private LocalDate releaseDate;
     @Min(1)
     private long duration;
+    private Map<Long, Integer> likes = new HashMap<>();
 }
