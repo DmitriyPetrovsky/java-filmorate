@@ -1,10 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -12,29 +11,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
+@Getter
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private static final Logger log = LoggerFactory.getLogger(InMemoryFilmStorage.class);
 
+    @Override
     public List<Film> getFilms() {
         log.info("Получен запрос на получение списка фильмов");
         return new ArrayList<>(films.values());
     }
 
-    public ResponseEntity<Film> addFilm(Film film) {
+    @Override
+    public Film addFilm(Film film) {
         log.info("Получен запрос на добавление фильма. Проверка на корректность введенных данных...");
         film.setId(getNextId());
         films.put(film.getId(), film);
-        return ResponseEntity.ok(film);
+        return film;
     }
 
-    public ResponseEntity<Film> updateFilm(Film film) {
+    public Film updateFilm(Film film) {
         log.info("Получен запрос на обновление фильма. Проверка на корректность введенных данных...");
         if (films.containsKey(film.getId())) {
             log.info("Всё ОК, фильм с ID: {} найден.", film.getId());
             films.put(film.getId(), film);
-            return ResponseEntity.ok(film);
+            return film;
         }
         log.error("Фильм с ID: {} не найден", film.getId());
         throw new NotFoundException("Фильм с ID: " + film.getId() + " не найден.");
@@ -49,4 +51,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Для фильма сгенерирован ID: {}", currentMaxId + 1);
         return ++currentMaxId;
     }
+
+    @Override
+    public Film getFilmById(long id) {
+            return films.get(id);
+    }
+
 }
