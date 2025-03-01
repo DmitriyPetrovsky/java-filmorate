@@ -30,4 +30,5 @@ public class GlobalExceptionHandler {
         Map<String, String> error = Map.of("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
 }
