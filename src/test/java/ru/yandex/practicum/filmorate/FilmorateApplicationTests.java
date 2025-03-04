@@ -12,12 +12,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.exception.ErrorMessageObject;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Optional;
 
 @SpringBootTest
 class FilmorateApplicationTests {
@@ -117,7 +118,7 @@ class FilmorateApplicationTests {
         user.setId(999L);
         ResponseEntity<String> response = testRestTemplate.exchange(USERS_URL, HttpMethod.PUT, new HttpEntity<>(user), String.class);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Неверный код ответа.");
-        Assertions.assertEquals("Пользователь с ID 999 не найден", getErrorMessage(response));
+        Assertions.assertEquals("Пользователь с ID: 999 не найден.", getErrorMessage(response));
     }
 
     @Test
@@ -168,7 +169,7 @@ class FilmorateApplicationTests {
         film.setReleaseDate(LocalDate.of(1880, 12, 31));
         ResponseEntity<String> response = testRestTemplate.postForEntity(FILMS_URL, film, String.class);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Неверный код ответа.");
-        Assertions.assertEquals("Поле releaseDate не должно быть ранее 1895-12-28", getErrorMessage(response));
+        Assertions.assertEquals("не должно быть ранее 1895-12-28", getErrorMessage(response));
     }
 
     @Test
@@ -188,7 +189,7 @@ class FilmorateApplicationTests {
         film.setId(999L);
         ResponseEntity<String> response = testRestTemplate.exchange(FILMS_URL, HttpMethod.PUT, new HttpEntity<>(film), String.class);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Неверный код ответа.");
-        Assertions.assertEquals("Фильм с ID 999 не найден", getErrorMessage(response));
+        Assertions.assertEquals("Фильм с ID: 999 не найден.", getErrorMessage(response));
     }
 
     private User getCorrectUser() {
@@ -211,8 +212,12 @@ class FilmorateApplicationTests {
 
     private String getErrorMessage(ResponseEntity<String> response) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ErrorMessageObject errorMessageObject = mapper.readValue(response.getBody(), ErrorMessageObject.class);
-        return errorMessageObject.getMessage();
+        Map<String, String> error = mapper.readValue(response.getBody(), Map.class);
+        Optional<String> resultOpt = error.values().stream().findFirst();
+        if (resultOpt.isPresent()) {
+            return resultOpt.get();
+        }
+        return null;
     }
 
     private User getUserFromResponse(ResponseEntity<String> response) throws IOException {
