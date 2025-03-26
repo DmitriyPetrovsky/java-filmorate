@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -16,12 +17,14 @@ import java.util.stream.Collectors;
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserStorage userStorage;
+    private final JdbcTemplate jdbc;
 
     public List<User> getFriends(long id) {
         User user = getUserById(id);
         if (user == null) {
             throw new NotFoundException("Пользователь с ID: " + id + " не найден.");
         }
+        //List<User> friends = jdbc.query();
         return userStorage.getAllUsers().stream()
                 .filter(u -> user.getFriends().contains(u.getId()))
                 .collect(Collectors.toList());
@@ -52,9 +55,9 @@ public class UserService {
             throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
         }
         user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        //friend.getFriends().add(userId);
         userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        //userStorage.updateUser(friend);
     }
 
     public void deleteFromFriends(long userId, long friendId) {

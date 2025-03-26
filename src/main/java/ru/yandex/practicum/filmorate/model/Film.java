@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.dal.dto.GenreDto;
+import ru.yandex.practicum.filmorate.dal.dto.MpaDto;
 import ru.yandex.practicum.filmorate.validator.MinimumDate;
 
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -23,4 +26,6 @@ public class Film {
     @Min(1)
     private long duration;
     private Map<Long, Integer> likes = new HashMap<>();
+    private Mpa mpa;
+    private List<Genre> genres;
 }
