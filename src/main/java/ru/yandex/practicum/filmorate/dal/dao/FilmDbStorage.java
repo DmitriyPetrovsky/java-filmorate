@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.dto.GenreDto;
-import ru.yandex.practicum.filmorate.dal.dto.MpaDto;
 import ru.yandex.practicum.filmorate.dal.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -13,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -21,12 +20,12 @@ import java.util.List;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
     private final FilmRowMapper filmRowMapper;
-    private final String GET_ALL_FILMS = "select * from films";
+    private final String GET_ALL_FILMS = "select * from films;";
     private final String GET_FILM_BY_ID = "select * from films where film_id = ?;";
     private final String ADD_FILM = "INSERT INTO films (title, description, release_date, duration) VALUES (?, ?, ?, ?);";
-    private final String UPDATE_FILM = "UPDATE films SET title = ?, description = ?, release_date = ?, duration = ? WHERE film_id = ?";
+    private final String UPDATE_FILM = "UPDATE films SET title = ?, description = ?, release_date = ?, duration = ? WHERE film_id = ?;";
     private final String ADD_FILM_GENRE = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?);";
-    private final String SET_MPA = "UPDATE films SET rating = ? WHERE film_id = ?";
+    private final String SET_MPA = "UPDATE films SET rating = ? WHERE film_id = ?;";
 
     @Override
     public List<Film> getFilms() {
@@ -88,5 +87,9 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             throw new NotFoundException("Некорректный идентификатор рейтинга");
         }
+    }
+
+    public int getLikes(long filmId) {
+        return jdbc.queryForObject("SELECT COUNT(*) FROM likes WHERE film_id = ?;", Integer.class, filmId);
     }
 }

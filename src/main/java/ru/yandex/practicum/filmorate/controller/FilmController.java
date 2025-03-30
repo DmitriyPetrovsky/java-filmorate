@@ -27,7 +27,7 @@ public class FilmController {
         return filmStorage.getFilms();
     }
 
-    @GetMapping("/filmId")
+    @GetMapping("/{filmId}")
     public Film getFilmById(@PathVariable long filmId) {
         log.info("Получен запрос на получение фильма по ID");
         return filmStorage.getFilmById(filmId);

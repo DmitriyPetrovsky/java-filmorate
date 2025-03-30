@@ -9,4 +9,5 @@ public class Genre {
     @Min(1)
     @Max(6)
     private int id;
+    String name;
 }

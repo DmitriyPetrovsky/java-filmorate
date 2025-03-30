@@ -78,4 +78,8 @@ public class FilmService {
         return true;
     }
 
+    public int getLikes(long filmId) {
+        return jdbc.queryForObject("SELECT COUNT(*) FROM likes WHERE film_id = ?;", Integer.class, filmId);
+    }
+
 }

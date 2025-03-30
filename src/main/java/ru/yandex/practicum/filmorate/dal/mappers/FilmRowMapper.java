@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dal.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.dao.GenreDao;
 import ru.yandex.practicum.filmorate.dal.dao.MpaDao;
-import ru.yandex.practicum.filmorate.dal.dto.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,9 +17,7 @@ import java.sql.SQLException;
 public class FilmRowMapper implements RowMapper<Film> {
     private final GenreDao genreDao;
     private final MpaDao mpaDao;
-    private final MpaIdRowMapper mpaIdRowMapper;
     private final JdbcTemplate jdbc;
-
 
     @Override
     public Film mapRow(ResultSet resultSet, int rowNum) throws SQLException {
@@ -30,8 +27,14 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setDescription(resultSet.getString("description"));
         film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
         film.setDuration(resultSet.getLong("duration"));
-        film.setMpa(mpaIdRowMapper.mapRow(resultSet, rowNum));
+        try {
+            film.setMpa(mpaDao.getRatingByFilmId(film.getId()));
+        } catch (Exception e) {
+            film.setMpa(null);
+        }
         film.setGenres(genreDao.getGenresByFilmId(film.getId()));
+        film.setLikes(jdbc.queryForObject("SELECT COUNT(*) FROM likes WHERE film_id = ?;", Integer.class, film.getId()));
+
         return film;
     }
 }

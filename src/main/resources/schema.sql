@@ -45,6 +45,5 @@ CREATE TABLE IF NOT EXISTS friends (
                                 friending_user_id INTEGER REFERENCES users (user_id),
                                 friended_user_id INTEGER REFERENCES users (user_id),
                                 accepted boolean DEFAULT FALSE,
-                                UNIQUE (friending_user_id, friended_user_id),
                                 CHECK (friending_user_id <> friended_user_id)
 );

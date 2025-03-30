@@ -41,6 +41,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     public User getUserById(long id) {
+        if (!isUserExist(id)) {
+            return null;
+        }
         return jdbc.queryForObject(GET_USER_BY_ID + id, userRowMapper);
     }
 

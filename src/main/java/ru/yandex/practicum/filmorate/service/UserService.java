@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -18,66 +19,60 @@ public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserStorage userStorage;
     private final JdbcTemplate jdbc;
+    private final UserRowMapper userRowMapper;
 
     public List<User> getFriends(long id) {
-        User user = getUserById(id);
-        if (user == null) {
+        if (!isUserExists(id)) {
             throw new NotFoundException("Пользователь с ID: " + id + " не найден.");
         }
-        //List<User> friends = jdbc.query();
-        return userStorage.getAllUsers().stream()
-                .filter(u -> user.getFriends().contains(u.getId()))
-                .collect(Collectors.toList());
+        String sql = "select * from users u join friends f on u.user_id=f.friended_user_id where f.friending_user_id = ?;";
+        return jdbc.query(sql, userRowMapper, id);
     }
 
     public List<User> getCommonFriends(long id, long friendId) {
-        User user = getUserById(id);
-        User friend = getUserById(friendId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с ID: " + id + " не найден.");
+        if (!isUserExists(id) || !isUserExists(friendId)) {
+            throw new NotFoundException("Пользователь не найден.");
         }
-        if (friend == null) {
-            throw new NotFoundException("Пользователь с ID: " + friendId + " не найден.");
-        }
-        return userStorage.getAllUsers().stream()
-                .filter(u -> user.getFriends().contains(u.getId()) && friend.getFriends().contains(u.getId()))
-                .collect(Collectors.toList());
+        String sql = "SELECT * " +
+                "FROM users u " +
+                "JOIN ( " +
+                "    SELECT f1.friended_user_id " +
+                "    FROM friends f1 " +
+                "    JOIN friends f2 ON f1.friended_user_id = f2.friended_user_id " +
+                "    WHERE f1.friending_user_id = ? " +
+                "    AND f2.friending_user_id = ? " +
+                ") AS common_friends ON u.user_id = common_friends.friended_user_id;";
+        return jdbc.query(sql, userRowMapper, id, friendId);
     }
 
     public void addToFriends(long userId, long friendId) {
         log.info("Попытка добавления в друзья пользователем {} пользователя {}", userId, friendId);
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
-        if (friend == null) {
-            throw new NotFoundException("Пользователь с ID: " + friendId + " не найден.");
+        if (!isUserExists(userId) || !isUserExists(friendId)) {
+            throw new NotFoundException("Пользователь не найден");
         }
-        if (user == null) {
-            throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
-        }
-        user.getFriends().add(friendId);
-        //friend.getFriends().add(userId);
-        userStorage.updateUser(user);
-        //userStorage.updateUser(friend);
+        String sql = "INSERT into friends(friending_user_id, friended_user_id) values(?, ?)";
+        jdbc.update(sql, userId, friendId);
     }
 
     public void deleteFromFriends(long userId, long friendId) {
         log.info("Попытка удаления из друзей пользователем {} пользователя {}", userId, friendId);
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
-        if (friend == null) {
-            throw new NotFoundException("Пользователь с ID: " + friendId + " не найден.");
+        if (!isUserExists(userId) || !isUserExists(friendId)) {
+            throw new NotFoundException("Пользователь не найден.");
         }
-        if (user == null) {
-            throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
-        }
-        friend.getFriends().remove(userId);
-        user.getFriends().remove(friendId);
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        String sql = "DELETE FROM friends WHERE friending_user_id = ? AND friended_user_id = ?;";
+        jdbc.update(sql, userId, friendId);
     }
 
     public User getUserById(long id) {
         return userStorage.getUserById(id);
+    }
+
+    private boolean isUserExists(long id) {
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            return false;
+        }
+        return true;
     }
 
 }

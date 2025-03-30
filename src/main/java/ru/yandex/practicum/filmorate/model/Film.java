@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.dal.dto.GenreDto;
-import ru.yandex.practicum.filmorate.dal.dto.MpaDto;
 import ru.yandex.practicum.filmorate.validator.MinimumDate;
 
 
@@ -25,7 +23,7 @@ public class Film {
     private LocalDate releaseDate;
     @Min(1)
     private long duration;
-    private Map<Long, Integer> likes = new HashMap<>();
     private Mpa mpa;
     private List<Genre> genres;
+    private int likes;
 }
