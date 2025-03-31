@@ -9,9 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +28,7 @@ public class UserRowMapper implements RowMapper<User> {
         String sql = "SELECT friended_user_id FROM friends WHERE friending_user_id = ?";
         friends = jdbc.queryForList(sql, Long.class, user.getId());
         user.setFriends(friends);
-
         return user;
     }
+
 }

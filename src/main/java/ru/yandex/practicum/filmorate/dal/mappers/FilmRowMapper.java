@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dal.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.dao.GenreDao;
 import ru.yandex.practicum.filmorate.dal.dao.MpaDao;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -34,7 +33,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         }
         film.setGenres(genreDao.getGenresByFilmId(film.getId()));
         film.setLikes(jdbc.queryForObject("SELECT COUNT(*) FROM likes WHERE film_id = ?;", Integer.class, film.getId()));
-
         return film;
     }
+
 }

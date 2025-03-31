@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.exception.IncorrectLikeException;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,32 +21,18 @@ public class FilmService {
     private final JdbcTemplate jdbc;
 
     public void likeFilm(long filmId, long userId) {
-        Film film = getFilmById(filmId);
-        if (film == null) {
-            throw new NotFoundException("Фильм с ID: " + filmId + " не найден.");
-        }
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
-        }
+        checkFilmUserCreated(filmId, userId);
         if (isLiked(filmId, userId)) {
-            throw new NotFoundException(String.format("Пользователь с id: %s уже поставил лайк фильму с id: %s", userId, filmId));
+            throw new IncorrectLikeException(String.format("Пользователь с id: %s уже поставил лайк фильму с id: %s", userId, filmId));
         }
         String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
         jdbc.update(sql, filmId, userId);
     }
 
     public void removeLike(long filmId, long userId) {
-        Film film = getFilmById(filmId);
-        if (film == null) {
-            throw new NotFoundException("Фильм с ID: " + filmId + " не найден.");
-        }
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
-        }
+        checkFilmUserCreated(filmId, userId);
         if (!isLiked(filmId, userId)) {
-            throw new NotFoundException(String.format("Пользователь с id: %s не ставил лайк фильму с id: %s", userId, filmId));
+            throw new IncorrectLikeException(String.format("Пользователь с id: %s не ставил лайк фильму с id: %s", userId, filmId));
         }
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbc.update(sql, filmId, userId);
@@ -72,14 +58,18 @@ public class FilmService {
     private boolean isLiked(long filmId, long userId) {
         String sql = "SELECT COUNT(*) FROM likes WHERE film_id = ? AND user_id = ?";
         Long count = jdbc.queryForObject(sql, Long.class, filmId, userId);
-        if (count == 0) {
-            return false;
-        }
-        return true;
+        return count != 0;
     }
 
-    public int getLikes(long filmId) {
-        return jdbc.queryForObject("SELECT COUNT(*) FROM likes WHERE film_id = ?;", Integer.class, filmId);
+    private void checkFilmUserCreated(Long filmId, Long userId) {
+        Film film = getFilmById(filmId);
+        if (film == null) {
+            throw new NotFoundException("Фильм с ID: " + filmId + " не найден.");
+        }
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new NotFoundException("Пользователь с ID: " + userId + " не найден.");
+        }
     }
 
 }

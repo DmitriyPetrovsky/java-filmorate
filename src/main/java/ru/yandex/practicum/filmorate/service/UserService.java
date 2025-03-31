@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,10 +68,7 @@ public class UserService {
 
     private boolean isUserExists(long id) {
         User user = userStorage.getUserById(id);
-        if (user == null) {
-            return false;
-        }
-        return true;
+        return user != null;
     }
 
 }

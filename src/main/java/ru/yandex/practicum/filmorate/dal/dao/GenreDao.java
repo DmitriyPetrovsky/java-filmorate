@@ -14,20 +14,16 @@ import java.util.*;
 public class GenreDao {
     private final JdbcTemplate jdbc;
     private final GenreRowMapper genreRowMapper;
-    private final String GET_ALL_GENRES = "select * from genre;";
-    private final String GET_GENRE_BY_ID = "select * from genre where genre_id = ?;";
-    private final String GET_GENRES_BY_FILM_ID = "SELECT * FROM genre g JOIN film_genre fg ON g.genre_id=fg.genre_id WHERE fg.film_id=?;";
-
 
     public List<Genre> getAllGenres() {
-        return jdbc.query(GET_ALL_GENRES, genreRowMapper);
+        return jdbc.query("SELECT * FROM genre;", genreRowMapper);
     }
 
     public Genre getGenreById(int id) {
         if (id < 1 || id > jdbc.queryForObject("SELECT COUNT(*) FROM genre;", Integer.class)) {
             throw new NotFoundException("Некорректный индекс жанра");
         }
-        return jdbc.queryForObject(GET_GENRE_BY_ID, genreRowMapper, id);
+        return jdbc.queryForObject("SELECT * FROM genre WHERE genre_id = ?;", genreRowMapper, id);
     }
 
     public List<Genre> getGenresByFilmId(long filmId) {
