@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -34,15 +33,16 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film addFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на добавление фильма");
-        return ResponseEntity.ok(filmStorage.addFilm(film));
+        return filmStorage.addFilm(film);
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма");
-        return ResponseEntity.ok(filmStorage.updateFilm(film));
+        return filmStorage.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
