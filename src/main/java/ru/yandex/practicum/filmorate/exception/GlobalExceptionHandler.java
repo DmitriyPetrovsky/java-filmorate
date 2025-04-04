@@ -6,6 +6,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.exception.IncorrectLikeException;
 import ru.yandex.practicum.filmorate.exception.exception.NotFoundException;
 
 import java.util.HashMap;
@@ -29,6 +30,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFound(final NotFoundException e) {
         Map<String, String> error = Map.of("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleIncorrectLike(final IncorrectLikeException e) {
+        Map<String, String> error = Map.of("error", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
 }

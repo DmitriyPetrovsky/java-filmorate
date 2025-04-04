@@ -1,2 +1,5 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Спринт 12: работа с базой данных H2.
+
+### Схема базы данных:
+![Схематичное изображение базы данных](db.png)
+
